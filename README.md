@@ -1,7 +1,7 @@
 # Confera - Event Management System
 
 <p align="center">
-  <img src="assets/confera-logo.png" alt="Confera Logo" width="280"/>
+  <img src="assets/confera-icon.png" alt="Confera Logo" width="280"/>
 </p>
 
 Confera is a web-based Event Management System designed to help event centers manage their daily operations in a simple and organized way. The system focuses on event bookings, hall availability, client information, event services, equipment management, invoices, payments, and user roles.
