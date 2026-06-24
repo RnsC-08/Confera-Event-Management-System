@@ -72,10 +72,10 @@ function NavigationItems({
           onClick={onNavigate}
           aria-current={isActive ? "page" : undefined}
           className={cn(
-            "flex items-center gap-3 rounded-lg border font-medium transition-colors",
+            "flex items-center gap-3 rounded-xl border font-medium transition-all duration-200",
             isActive
-              ? "border-blue-100 bg-blue-50 text-[#1648b8] shadow-sm"
-              : "border-transparent text-slate-600 hover:border-blue-100 hover:bg-blue-50/60 hover:text-[#1648b8]",
+              ? "border-blue-200 bg-[linear-gradient(135deg,#eaf4ff_0%,#f5fbff_100%)] text-[#123b98] shadow-[0_8px_22px_rgba(22,72,184,0.12)]"
+              : "border-transparent text-slate-600 hover:border-blue-100 hover:bg-white/70 hover:text-[#1648b8] hover:shadow-sm",
             mobile ? "px-3 py-2 text-xs" : collapsed ? "justify-center px-2 py-2.5 text-sm" : "px-3 py-2.5 text-sm",
           )}
         >
@@ -118,25 +118,25 @@ export function ConferaSidebar({
 
   return (
     <>
-      <aside className="hidden min-h-screen border-r border-blue-100 bg-white/95 shadow-[5px_0_18px_rgba(15,45,100,0.04)] lg:block">
+      <aside className="hidden min-h-screen border-r border-blue-100/80 bg-[linear-gradient(180deg,#ffffff_0%,#f2f8ff_46%,#eaf5ff_100%)] shadow-[8px_0_28px_rgba(15,45,100,0.08)] lg:block">
         <div className={cn("sticky top-0 flex h-screen flex-col transition-[width] duration-200", collapsed ? "w-[72px]" : "w-60")}>
-          <div className={cn("flex h-[68px] items-center gap-3 border-b border-blue-100 bg-gradient-to-r from-blue-50/80 to-white", collapsed ? "justify-center px-2" : "px-5")}>
+          <div className={cn("flex h-[68px] items-center gap-3 border-b border-blue-100/80 bg-[linear-gradient(135deg,#eef7ff_0%,#ffffff_100%)]", collapsed ? "justify-center px-2" : "px-5")}>
             <Image
               src="/confera/logo%203.png"
               alt="Confera"
               width={36}
               height={36}
-              className="size-9 object-contain"
+              className="size-9 rounded-xl object-contain shadow-sm"
               priority
             />
             <div className={cn("min-w-0", collapsed && "hidden")}>
-              <p className="font-semibold leading-5 text-slate-900">Confera</p>
+              <p className="font-semibold leading-5 text-[#0b2d6b]">Confera</p>
               <p className="truncate text-xs text-slate-500">Event Management System</p>
             </div>
             <button
               type="button"
               onClick={() => onCollapsedChange?.(!collapsed)}
-              className={cn("flex size-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-blue-100 hover:text-blue-700", collapsed ? "absolute left-5 top-[76px]" : "ml-auto")}
+              className={cn("flex size-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white hover:text-blue-700 hover:shadow-sm", collapsed ? "absolute left-5 top-[76px]" : "ml-auto")}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
@@ -148,33 +148,33 @@ export function ConferaSidebar({
             <NavigationItems activeItem={activeItem} collapsed={collapsed} allowedItems={allowedItems} />
           </nav>
 
-          <div className={cn("border-t border-blue-100 bg-slate-50/70 px-3 py-3", collapsed && "flex justify-center px-2")}>
+          <div className={cn("border-t border-blue-100/80 bg-white/55 px-3 py-3 backdrop-blur", collapsed && "flex justify-center px-2")}>
             {!collapsed && <div className="min-w-0"><p className="truncate text-xs font-medium text-slate-700">{user?.full_name}</p><p className="mt-0.5 truncate text-xs text-slate-400">{user?.role_name}</p></div>}
             <button type="button" onClick={() => void logout()} className={cn("flex size-8 items-center justify-center rounded-lg text-slate-500 hover:bg-rose-50 hover:text-rose-600", !collapsed && "ml-auto -mt-8")} aria-label="Logout" title="Logout"><LogOut className="size-4" /></button>
           </div>
         </div>
       </aside>
 
-      <div className="border-b border-blue-100 bg-white/95 shadow-sm lg:hidden">
-        <div className="flex h-16 items-center gap-3 bg-gradient-to-r from-blue-50/70 to-white px-4">
+      <div className="border-b border-blue-100/80 bg-white/90 shadow-sm backdrop-blur lg:hidden">
+        <div className="flex h-16 items-center gap-3 bg-[linear-gradient(135deg,#eef7ff_0%,#ffffff_100%)] px-4">
           <Image
             src="/confera/logo%203.png"
             alt="Confera"
             width={34}
             height={34}
-            className="size-8 object-contain"
+            className="size-8 rounded-lg object-contain shadow-sm"
             priority
           />
           <div>
             <p className="text-sm font-semibold text-slate-900">Confera</p>
             <p className="text-xs text-slate-500">Event Management System</p>
           </div>
-          <button type="button" onClick={() => onMobileOpenChange?.(!mobileOpen)} className="ml-auto flex size-9 items-center justify-center rounded-lg text-slate-600 hover:bg-blue-100 hover:text-blue-700" aria-label={mobileOpen ? "Close navigation" : "Open navigation"}>
+          <button type="button" onClick={() => onMobileOpenChange?.(!mobileOpen)} className="ml-auto flex size-9 items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:text-blue-700 hover:shadow-sm" aria-label={mobileOpen ? "Close navigation" : "Open navigation"}>
             {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
         {mobileOpen && (
-          <nav className="grid grid-cols-2 gap-1 border-t border-blue-100 px-3 py-3 sm:grid-cols-3" aria-label="Confera mobile navigation">
+          <nav className="grid grid-cols-2 gap-1 border-t border-blue-100 bg-blue-50/35 px-3 py-3 sm:grid-cols-3" aria-label="Confera mobile navigation">
             <NavigationItems activeItem={activeItem} mobile allowedItems={allowedItems} onNavigate={() => onMobileOpenChange?.(false)} />
           </nav>
         )}

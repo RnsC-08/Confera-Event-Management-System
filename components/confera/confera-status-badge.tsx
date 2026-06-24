@@ -2,12 +2,12 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 const palette = {
-  blue: "border-blue-200 bg-blue-50 text-blue-700",
-  green: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  amber: "border-amber-200 bg-amber-50 text-amber-700",
-  slate: "border-slate-200 bg-slate-100 text-slate-700",
-  red: "border-rose-200 bg-rose-50 text-rose-700",
-  purple: "border-violet-200 bg-violet-50 text-violet-700",
+  blue: "border-blue-200 bg-blue-50 text-blue-700 shadow-blue-900/5",
+  cyan: "border-cyan-200 bg-cyan-50 text-cyan-700 shadow-cyan-900/5",
+  green: "border-emerald-200 bg-emerald-50 text-emerald-700 shadow-emerald-900/5",
+  amber: "border-amber-200 bg-amber-50 text-amber-700 shadow-amber-900/5",
+  slate: "border-slate-200 bg-slate-100 text-slate-700 shadow-slate-900/5",
+  red: "border-rose-200 bg-rose-50 text-rose-700 shadow-rose-900/5",
 }
 
 function getTone(value: string) {
@@ -25,7 +25,7 @@ function getTone(value: string) {
       return palette.blue
     case "InProgress":
     case "In use":
-      return palette.purple
+      return palette.cyan
     case "Unpaid":
     case "Maintenance":
     case "Pending":
@@ -36,7 +36,7 @@ function getTone(value: string) {
     case "Failed":
       return palette.red
     case "Refunded":
-      return palette.purple
+      return palette.cyan
     default:
       return palette.slate
   }

@@ -26,16 +26,19 @@ export function ConferaPageShell({
   }, [activeItem, loading, router, user])
 
   if (loading || !user || !canAccessConferaPage(user.role_name, activeItem)) {
-    return <div className="flex min-h-screen items-center justify-center bg-slate-50"><Loader2 className="size-6 animate-spin text-blue-700" /></div>
+    return <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,#f8fbff_0%,#eaf6ff_48%,#eefcff_100%)]"><Loader2 className="size-6 animate-spin text-blue-700" /></div>
   }
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(145deg,#f7faff_0%,#f1f6fc_48%,#eef4fa_100%)] text-slate-900">
+    <div className="relative min-h-screen overflow-x-hidden bg-[linear-gradient(135deg,#f8fbff_0%,#edf7ff_44%,#eefcff_100%)] text-slate-900">
+      <div className="pointer-events-none fixed -left-36 top-24 size-96 rounded-full bg-cyan-200/30 blur-3xl" />
+      <div className="pointer-events-none fixed -right-40 bottom-10 size-[28rem] rounded-full bg-blue-300/25 blur-3xl" />
+      <div className="pointer-events-none fixed left-1/2 top-1/2 size-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/35 blur-3xl" />
       <div
         className={
           collapsed
-            ? "lg:grid lg:grid-cols-[72px_minmax(0,1fr)]"
-            : "lg:grid lg:grid-cols-[240px_minmax(0,1fr)]"
+            ? "relative z-10 lg:grid lg:grid-cols-[72px_minmax(0,1fr)]"
+            : "relative z-10 lg:grid lg:grid-cols-[240px_minmax(0,1fr)]"
         }
       >
         <ConferaSidebar

@@ -47,12 +47,8 @@ export default function LoginPage() {
       <div className="pointer-events-none absolute bottom-0 right-1/4 h-44 w-[460px] translate-x-1/2 rotate-12 rounded-full border border-cyan-100/80 bg-cyan-100/20 blur-sm" />
       <div className="pointer-events-none absolute left-10 top-20 hidden h-32 w-32 rounded-full border border-white/80 bg-white/20 sm:block" />
       <div className="pointer-events-none absolute bottom-16 right-16 hidden h-24 w-24 rounded-full border border-cyan-100 bg-cyan-100/20 sm:block" />
-      <div className="pointer-events-none absolute left-[18%] top-[62%] hidden grid-cols-3 gap-2 opacity-45 md:grid">
-        {Array.from({ length: 9 }).map((_, index) => <span key={index} className="size-1.5 rounded-full bg-[#1648b8]" />)}
-      </div>
-      <div className="pointer-events-none absolute right-[18%] top-[18%] hidden grid-cols-4 gap-2 opacity-35 md:grid">
-        {Array.from({ length: 12 }).map((_, index) => <span key={index} className="size-1 rounded-full bg-cyan-500" />)}
-      </div>
+      <div className="pointer-events-none absolute left-[18%] top-[62%] hidden h-16 w-16 bg-[radial-gradient(circle,#1648b8_1.5px,transparent_2px)] bg-[length:18px_18px] opacity-45 md:block" />
+      <div className="pointer-events-none absolute right-[18%] top-[18%] hidden h-14 w-20 bg-[radial-gradient(circle,#06b6d4_1px,transparent_1.5px)] bg-[length:16px_16px] opacity-35 md:block" />
 
       <Card className="relative z-10 w-full max-w-[430px] rounded-3xl border border-white/70 bg-white/85 shadow-[0_26px_90px_rgba(15,45,100,0.18)] backdrop-blur-xl">
         <CardHeader className="items-center px-7 pb-5 pt-7 text-center sm:px-9">
