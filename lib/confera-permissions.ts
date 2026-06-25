@@ -75,6 +75,10 @@ export function canWriteConferaResource(role: ConferaRole, resource: string) {
   return (actionMap[resource] ?? []).some((action) => canPerformConferaAction(role, action))
 }
 
+export function canViewFinancialData(role: ConferaRole) {
+  return role !== "Operational Staff"
+}
+
 export function canUseConferaApi(role: ConferaRole, resource: string, method: string) {
   if (role === "Administrator") return true
   if (method === "GET") {

@@ -16,11 +16,13 @@ const selectClass = "flex h-9 w-full rounded-md border border-slate-200 bg-white
 export function ConferaEquipmentForm({
   open,
   equipment,
+  showFinancialData = true,
   onOpenChange,
   onSubmit,
 }: {
   open: boolean
   equipment: Equipment | null
+  showFinancialData?: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (payload: Record<string, unknown>, editing: boolean) => Promise<void>
 }) {
@@ -35,25 +37,27 @@ export function ConferaEquipmentForm({
     const category = String(form.get("category") ?? "").trim()
     const quantityTotal = Number(form.get("quantity_total"))
     const quantityAvailable = Number(form.get("quantity_available"))
-    const unitCost = Number(form.get("unit_cost"))
 
     if (!name) return setError("Name is required.")
     if (!category) return setError("Category is required.")
     if (!Number.isFinite(quantityTotal) || quantityTotal < 0) return setError("Total quantity must be 0 or greater.")
     if (!Number.isFinite(quantityAvailable) || quantityAvailable < 0) return setError("Available quantity must be 0 or greater.")
     if (quantityAvailable > quantityTotal) return setError("Available quantity cannot be greater than total quantity.")
-    if (!Number.isFinite(unitCost) || unitCost < 0) return setError("Unit cost must be 0 or greater.")
 
-    const payload = {
+    const payload: Record<string, unknown> = {
       ...(equipment ? { equipment_id: equipment.equipment_id } : {}),
       name,
       category,
       quantity_total: quantityTotal,
       quantity_available: quantityAvailable,
-      unit_cost: unitCost,
       status: String(form.get("status")),
       notes: String(form.get("notes") ?? "").trim() || null,
       is_active: form.get("is_active") === "on",
+    }
+    if (showFinancialData) {
+      const unitCost = Number(form.get("unit_cost"))
+      if (!Number.isFinite(unitCost) || unitCost < 0) return setError("Unit cost must be 0 or greater.")
+      payload.unit_cost = unitCost
     }
 
     try {
@@ -80,7 +84,7 @@ export function ConferaEquipmentForm({
             <div className="space-y-2"><Label htmlFor="equipment-category">Category <span className="text-rose-600">*</span></Label><Input id="equipment-category" name="category" defaultValue={equipment?.category ?? ""} required placeholder="Audio, Lighting, Furniture..." className={inputClass} /></div>
             <div className="space-y-2"><Label htmlFor="quantity-total">Total quantity <span className="text-rose-600">*</span></Label><Input id="quantity-total" name="quantity_total" type="number" min="0" step="1" defaultValue={equipment?.quantity_total ?? 0} required className={inputClass} /></div>
             <div className="space-y-2"><Label htmlFor="quantity-available">Available quantity <span className="text-rose-600">*</span></Label><Input id="quantity-available" name="quantity_available" type="number" min="0" step="1" defaultValue={equipment?.quantity_available ?? 0} required className={inputClass} /></div>
-            <div className="space-y-2"><Label htmlFor="unit-cost">Unit cost <span className="text-rose-600">*</span></Label><Input id="unit-cost" name="unit_cost" type="number" min="0" step="0.01" defaultValue={equipment?.unit_cost ?? 0} required className={inputClass} /></div>
+            {showFinancialData && <div className="space-y-2"><Label htmlFor="unit-cost">Unit cost <span className="text-rose-600">*</span></Label><Input id="unit-cost" name="unit_cost" type="number" min="0" step="0.01" defaultValue={equipment?.unit_cost ?? 0} required className={inputClass} /></div>}
             <div className="space-y-2"><Label htmlFor="equipment-status">Status <span className="text-rose-600">*</span></Label><select id="equipment-status" name="status" defaultValue={equipment?.status ?? "Available"} className={selectClass}>{equipmentStatuses.map((status) => <option key={status}>{status}</option>)}</select></div>
             <div className="space-y-2 sm:col-span-2"><Label htmlFor="equipment-notes">Notes</Label><Textarea id="equipment-notes" name="notes" defaultValue={equipment?.notes ?? ""} rows={3} className={inputClass} /></div>
             <label className="flex items-center gap-2 text-sm text-slate-700 sm:col-span-2"><input type="checkbox" name="is_active" defaultChecked={equipment ? Boolean(equipment.is_active) : true} className="size-4 accent-blue-700" /> Active equipment</label>

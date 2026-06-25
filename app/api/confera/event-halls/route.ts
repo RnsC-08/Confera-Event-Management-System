@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise"
+import { getConferaSession } from "@/lib/confera-auth"
+import { canViewFinancialData } from "@/lib/confera-permissions"
 import { getMysqlPool, mysqlQuery } from "@/lib/mysql-db"
 
 const HALL_STATUSES = [
@@ -105,6 +107,8 @@ function badRequest(message: string) {
 
 export async function GET() {
   try {
+    const session = await getConferaSession()
+    const showFinancialData = Boolean(session && canViewFinancialData(session.role_name))
     const halls = await mysqlQuery<EventHallRow[]>(
       `
         SELECT
@@ -124,7 +128,7 @@ export async function GET() {
       [1],
     )
 
-    return NextResponse.json(halls)
+    return NextResponse.json(showFinancialData ? halls : halls.map(({ base_price: _basePrice, ...hall }) => hall))
   } catch (error: any) {
     console.error("GET /api/confera/event-halls error:", error)
     return NextResponse.json(

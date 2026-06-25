@@ -28,9 +28,11 @@ function formatNumber(value: number) {
 export function ConferaStatCards({
   counts,
   staffTaskCount,
+  showFinancialData = true,
 }: {
   counts: ConferaCounts
   staffTaskCount: number
+  showFinancialData?: boolean
 }) {
   const cards: StatCard[] = [
     { label: "Active Halls", value: counts.total_active_halls, icon: DoorOpen, tone: "bg-blue-100 text-blue-800 ring-blue-200", accent: "bg-blue-500", surface: "bg-[linear-gradient(135deg,#ffffff_0%,#e8f3ff_100%)]" },
@@ -42,10 +44,13 @@ export function ConferaStatCards({
     { label: "Available Equipment", value: counts.total_available_equipment, icon: Boxes, tone: "bg-blue-100 text-blue-800 ring-blue-200", accent: "bg-blue-600", surface: "bg-[linear-gradient(135deg,#ffffff_0%,#edf5ff_100%)]" },
     { label: "Staff Tasks", value: staffTaskCount, icon: ClipboardCheck, tone: "bg-cyan-100 text-cyan-800 ring-cyan-200", accent: "bg-cyan-500", surface: "bg-[linear-gradient(135deg,#ffffff_0%,#e6fbff_100%)]" },
   ]
+  const visibleCards = showFinancialData
+    ? cards
+    : cards.filter((card) => ["Active Halls", "Confirmed Bookings", "Available Equipment", "Staff Tasks"].includes(card.label))
 
   return (
     <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Dashboard summary">
-      {cards.map((card) => {
+      {visibleCards.map((card) => {
         const Icon = card.icon
         return (
           <Card key={card.label} className={`group relative overflow-hidden rounded-2xl border-blue-100/90 ${card.surface} shadow-[0_14px_34px_rgba(15,45,100,0.12)] transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-[0_18px_42px_rgba(15,72,184,0.16)]`}>

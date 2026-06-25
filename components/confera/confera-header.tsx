@@ -1,6 +1,6 @@
 import { CalendarDays } from "lucide-react"
 
-export function ConferaHeader() {
+export function ConferaHeader({ showFinancialData = true }: { showFinancialData?: boolean }) {
   const today = new Intl.DateTimeFormat("en-US", {
     weekday: "long",
     month: "long",
@@ -13,7 +13,9 @@ export function ConferaHeader() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Dashboard</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Overview of bookings, halls, invoices, equipment, and staff tasks.
+          {showFinancialData
+            ? "Overview of bookings, halls, invoices, equipment, and staff tasks."
+            : "Overview of bookings, halls, equipment, and staff tasks."}
         </p>
       </div>
       <div className="flex w-fit items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/80 px-3 py-2 text-sm font-medium text-slate-700 shadow-sm">

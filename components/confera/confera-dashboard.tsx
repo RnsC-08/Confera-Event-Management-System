@@ -13,6 +13,8 @@ import { ConferaStaffTasks } from "@/components/confera/confera-staff-tasks"
 import { ConferaStatCards } from "@/components/confera/confera-stat-cards"
 import type { ConferaDashboardData } from "@/components/confera/confera-types"
 import { ConferaUpcomingEvents } from "@/components/confera/confera-upcoming-events"
+import { useAuth } from "@/lib/auth-context"
+import { canViewFinancialData } from "@/lib/confera-permissions"
 
 const emptyDashboardData: ConferaDashboardData = {
   counts: {
@@ -100,6 +102,8 @@ function ErrorState({
 }
 
 export function ConferaDashboard() {
+  const { user } = useAuth()
+  const showFinancialData = Boolean(user && canViewFinancialData(user.role_name))
   const [data, setData] = useState<ConferaDashboardData>(emptyDashboardData)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -130,16 +134,16 @@ export function ConferaDashboard() {
             <ErrorState message={error} onRetry={() => void loadDashboard()} />
           ) : (
             <div className="space-y-6">
-              <ConferaHeader />
-              <ConferaStatCards counts={data.counts} staffTaskCount={data.staff_tasks.length} />
+              <ConferaHeader showFinancialData={showFinancialData} />
+              <ConferaStatCards counts={data.counts} staffTaskCount={data.staff_tasks.length} showFinancialData={showFinancialData} />
 
               <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
                 <ConferaUpcomingEvents items={data.upcoming_events} />
                 <ConferaHallStatuses items={data.hall_statuses} />
               </div>
 
-              <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
-                <ConferaRecentInvoices items={data.recent_invoices} />
+              <div className={showFinancialData ? "grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]" : "grid gap-4 xl:grid-cols-1"}>
+                {showFinancialData && <ConferaRecentInvoices items={data.recent_invoices} />}
                 <ConferaStaffTasks items={data.staff_tasks} />
               </div>
             </div>

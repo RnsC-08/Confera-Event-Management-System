@@ -13,7 +13,7 @@ import { equipmentStatuses } from "@/components/confera/confera-equipment-types"
 import { ConferaPageShell } from "@/components/confera/confera-page-shell"
 import { ConferaStatusBadge } from "@/components/confera/confera-status-badge"
 import { useAuth } from "@/lib/auth-context"
-import { canPerformConferaAction } from "@/lib/confera-permissions"
+import { canPerformConferaAction, canViewFinancialData } from "@/lib/confera-permissions"
 
 class EquipmentApiError extends Error {
   constructor(message: string, readonly status: number) { super(message) }
@@ -39,6 +39,7 @@ export function ConferaEquipmentPage() {
   const { user } = useAuth()
   const canCreate = Boolean(user && canPerformConferaAction(user.role_name, "equipment:create"))
   const canUpdate = Boolean(user && canPerformConferaAction(user.role_name, "equipment:update"))
+  const showFinancialData = Boolean(user && canViewFinancialData(user.role_name))
   const [equipment, setEquipment] = useState<Equipment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -124,9 +125,9 @@ export function ConferaEquipmentPage() {
                     <article key={item.equipment_id} className="rounded-xl border border-blue-100 p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
                       <div className="flex items-start justify-between gap-3"><div className="min-w-0"><h2 className="truncate font-medium text-slate-900">{item.name}</h2><Badge variant="outline" className="mt-2 border-cyan-200 bg-cyan-50 text-cyan-700">{item.category}</Badge></div><ConferaStatusBadge value={item.status} /></div>
 
-                      <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+                      <div className={showFinancialData ? "mt-5 grid grid-cols-2 gap-3 text-sm" : "mt-5 grid gap-3 text-sm"}>
                         <div className="rounded-lg bg-slate-50 p-3"><p className="flex items-center gap-1.5 text-xs text-slate-400"><PackageCheck className="size-3.5" />Available</p><p className="mt-1 text-lg font-semibold text-slate-900">{item.quantity_available} <span className="text-xs font-normal text-slate-400">/ {item.quantity_total}</span></p></div>
-                        <div className="rounded-lg bg-slate-50 p-3"><p className="flex items-center gap-1.5 text-xs text-slate-400"><CircleDollarSign className="size-3.5" />Unit cost</p><p className="mt-1 text-lg font-semibold text-slate-900">EUR {Number(item.unit_cost).toFixed(2)}</p></div>
+                        {showFinancialData && <div className="rounded-lg bg-slate-50 p-3"><p className="flex items-center gap-1.5 text-xs text-slate-400"><CircleDollarSign className="size-3.5" />Unit cost</p><p className="mt-1 text-lg font-semibold text-slate-900">EUR {Number(item.unit_cost).toFixed(2)}</p></div>}
                       </div>
 
                       <div className="mt-3"><div className="flex justify-between text-xs text-slate-400"><span>Availability</span><span>{Math.round(availability)}%</span></div><div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-[#2864d7] transition-[width]" style={{ width: `${availability}%` }} /></div></div>
@@ -142,7 +143,7 @@ export function ConferaEquipmentPage() {
         </Card>
       </div>
 
-      {(canCreate || canUpdate) && <ConferaEquipmentForm open={formOpen} equipment={editing} onOpenChange={setFormOpen} onSubmit={saveEquipment} />}
+      {(canCreate || canUpdate) && <ConferaEquipmentForm open={formOpen} equipment={editing} showFinancialData={showFinancialData} onOpenChange={setFormOpen} onSubmit={saveEquipment} />}
     </ConferaPageShell>
   )
 }

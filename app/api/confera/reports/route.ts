@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import type { RowDataPacket } from "mysql2/promise"
+import { getConferaSession } from "@/lib/confera-auth"
+import { canViewFinancialData } from "@/lib/confera-permissions"
 import { mysqlQuery } from "@/lib/mysql-db"
 
 const REPORT_TYPES = ["bookings", "payments", "hall-usage", "equipment", "staff"] as const
@@ -149,17 +151,25 @@ async function getStaffReport() {
 
 export async function GET(req: NextRequest) {
   try {
+    const session = await getConferaSession()
+    const showFinancialData = Boolean(session && canViewFinancialData(session.role_name))
+    const availableReportTypes = showFinancialData
+      ? REPORT_TYPES
+      : REPORT_TYPES.filter((reportType) => reportType !== "payments")
     const { searchParams } = new URL(req.url)
     const type = searchParams.get("type")
 
     if (!type) {
       return NextResponse.json({
-        available_report_types: REPORT_TYPES,
+        available_report_types: availableReportTypes,
       })
     }
 
     if (!REPORT_TYPES.includes(type as ReportType)) {
       return badRequest(`type must be one of: ${REPORT_TYPES.join(", ")}`)
+    }
+    if (!showFinancialData && type === "payments") {
+      return NextResponse.json({ error: "Operational Staff cannot view payment reports" }, { status: 403 })
     }
 
     switch (type as ReportType) {

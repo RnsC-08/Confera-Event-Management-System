@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import type { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise"
+import { getConferaSession } from "@/lib/confera-auth"
+import { canViewFinancialData } from "@/lib/confera-permissions"
 import { getMysqlPool, mysqlQuery } from "@/lib/mysql-db"
 
 const BOOKING_STATUSES = ["Draft", "Confirmed", "Cancelled", "Completed"] as const
@@ -363,6 +365,8 @@ async function createUniqueBookingReference(
 
 export async function GET(req: NextRequest) {
   try {
+    const session = await getConferaSession()
+    const showFinancialData = Boolean(session && canViewFinancialData(session.role_name))
     const { searchParams } = new URL(req.url)
     const status = searchParams.get("status")
     const eventDate = searchParams.get("event_date")
@@ -381,7 +385,7 @@ export async function GET(req: NextRequest) {
     })
 
     const bookings = await mysqlQuery<EventBookingRow[]>(query, params)
-    return NextResponse.json(bookings)
+    return NextResponse.json(showFinancialData ? bookings : bookings.map(({ hall_base_price: _hallBasePrice, package_price: _packagePrice, discount_amount: _discountAmount, ...booking }) => booking))
   } catch (error: any) {
     console.error("GET /api/confera/event-bookings error:", error)
     return NextResponse.json(

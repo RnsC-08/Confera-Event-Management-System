@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import type { RowDataPacket } from "mysql2/promise"
+import { getConferaSession } from "@/lib/confera-auth"
+import { canViewFinancialData } from "@/lib/confera-permissions"
 import { mysqlQuery } from "@/lib/mysql-db"
 
 type CountRow = RowDataPacket & {
@@ -60,6 +62,8 @@ type StaffTaskRow = RowDataPacket & {
 
 export async function GET() {
   try {
+    const session = await getConferaSession()
+    const showFinancialData = Boolean(session && canViewFinancialData(session.role_name))
     const countRows = await mysqlQuery<CountRow[]>(
       `
         SELECT
@@ -157,8 +161,7 @@ export async function GET() {
       `,
     )
 
-    return NextResponse.json({
-      counts: countRows[0] ?? {
+    const counts = countRows[0] ?? {
         total_active_halls: 0,
         total_active_clients: 0,
         total_confirmed_bookings: 0,
@@ -169,10 +172,19 @@ export async function GET() {
         total_paid_invoices: 0,
         total_available_equipment: 0,
         total_assigned_equipment: 0,
-      },
+      }
+
+    if (!showFinancialData) {
+      counts.total_unpaid_invoices = 0
+      counts.total_partial_invoices = 0
+      counts.total_paid_invoices = 0
+    }
+
+    return NextResponse.json({
+      counts,
       upcoming_events: upcomingEvents,
       hall_statuses: hallStatuses,
-      recent_invoices: recentInvoices,
+      recent_invoices: showFinancialData ? recentInvoices : [],
       staff_tasks: staffTasks,
     })
   } catch (error: any) {

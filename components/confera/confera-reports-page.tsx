@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ConferaPageShell } from "@/components/confera/confera-page-shell"
 import type { ReportRows, ReportType } from "@/components/confera/confera-report-types"
 import { ConferaStatusBadge } from "@/components/confera/confera-status-badge"
+import { useAuth } from "@/lib/auth-context"
+import { canViewFinancialData } from "@/lib/confera-permissions"
 
 type ReportTab = "overview" | ReportType
 type OverviewResponse = { available_report_types: ReportType[] }
@@ -38,6 +40,9 @@ function currency(value: number | string) {
 }
 
 export function ConferaReportsPage() {
+  const { user } = useAuth()
+  const showFinancialData = Boolean(user && canViewFinancialData(user.role_name))
+  const visibleReportTypes = (Object.keys(reportDetails) as ReportType[]).filter((type) => showFinancialData || type !== "payments")
   const [activeTab, setActiveTab] = useState<ReportTab>("overview")
   const [availableTypes, setAvailableTypes] = useState<ReportType[]>([])
   const [reports, setReports] = useState<Partial<ReportRows>>({})
@@ -52,7 +57,7 @@ export function ConferaReportsPage() {
       setErrors((current) => ({ ...current, [tab]: undefined }))
       if (tab === "overview") {
         const result = await reportRequest<OverviewResponse>("/api/confera/reports")
-        setAvailableTypes(result.available_report_types)
+        setAvailableTypes(result.available_report_types.filter((type) => showFinancialData || type !== "payments"))
       } else {
         const result = await reportRequest<{ type: ReportType; rows: ReportRows[ReportType] }>(`/api/confera/reports?type=${tab}`)
         setReports((current) => ({ ...current, [tab]: result.rows }))
@@ -68,6 +73,7 @@ export function ConferaReportsPage() {
 
   function changeTab(value: string) {
     const tab = value as ReportTab
+    if (!showFinancialData && tab === "payments") return
     setActiveTab(tab)
     void loadTab(tab)
   }
@@ -75,13 +81,13 @@ export function ConferaReportsPage() {
   return (
     <ConferaPageShell activeItem="reports">
       <div className="space-y-6">
-        <header className="rounded-2xl border border-blue-100/80 bg-white/75 px-5 py-5 shadow-[0_12px_34px_rgba(15,45,100,0.08)] backdrop-blur">
+        <header className="confera-page-header rounded-2xl px-5 py-5">
           <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Reports</h1>
-          <p className="mt-1 text-sm text-slate-500">View booking, payment, hall usage, equipment, and staff reports.</p>
+          <p className="mt-1 text-sm text-slate-500">{showFinancialData ? "View booking, payment, hall usage, equipment, and staff reports." : "View operational booking, hall usage, equipment, and staff reports."}</p>
         </header>
 
         <Tabs value={activeTab} onValueChange={changeTab} className="gap-5">
-          <div className="overflow-x-auto pb-1"><TabsList className="h-12 min-w-max rounded-2xl border border-blue-100 bg-white/80 p-1.5 shadow-sm backdrop-blur"><TabsTrigger value="overview" className="rounded-xl px-4 text-slate-600 data-[state=active]:bg-[linear-gradient(135deg,#eaf4ff_0%,#f8fcff_100%)] data-[state=active]:text-blue-700 data-[state=active]:shadow-sm"><FileBarChart />Overview</TabsTrigger>{(Object.keys(reportDetails) as ReportType[]).map((type) => { const detail = reportDetails[type]; const Icon = detail.icon; return <TabsTrigger key={type} value={type} className="rounded-xl px-4 text-slate-600 data-[state=active]:bg-[linear-gradient(135deg,#eaf4ff_0%,#f8fcff_100%)] data-[state=active]:text-blue-700 data-[state=active]:shadow-sm"><Icon />{detail.label}</TabsTrigger> })}</TabsList></div>
+          <div className="overflow-x-auto pb-1"><TabsList className="confera-tabs-list h-12 min-w-max rounded-2xl p-1.5"><TabsTrigger value="overview" className="rounded-xl px-4 text-slate-600 data-[state=active]:bg-[linear-gradient(135deg,#dff2ff_0%,#ffffff_100%)] data-[state=active]:text-blue-700 data-[state=active]:shadow-sm"><FileBarChart />Overview</TabsTrigger>{visibleReportTypes.map((type) => { const detail = reportDetails[type]; const Icon = detail.icon; return <TabsTrigger key={type} value={type} className="rounded-xl px-4 text-slate-600 data-[state=active]:bg-[linear-gradient(135deg,#dff2ff_0%,#ffffff_100%)] data-[state=active]:text-blue-700 data-[state=active]:shadow-sm"><Icon />{detail.label}</TabsTrigger> })}</TabsList></div>
 
           <TabsContent value="overview">
             <ReportContainer title="Available Reports" loading={loadingTab === "overview"} error={errors.overview} onRetry={() => void loadTab("overview", true)} empty={availableTypes.length === 0}>
@@ -89,7 +95,7 @@ export function ConferaReportsPage() {
             </ReportContainer>
           </TabsContent>
 
-          {(Object.keys(reportDetails) as ReportType[]).map((type) => (
+          {visibleReportTypes.map((type) => (
             <TabsContent key={type} value={type}>
               <ReportContainer title={`${reportDetails[type].label} Report`} loading={loadingTab === type} error={errors[type]} onRetry={() => void loadTab(type, true)} empty={(reports[type]?.length ?? 0) === 0}>
                 <ReportTable type={type} rows={reports[type] ?? []} />
@@ -103,11 +109,11 @@ export function ConferaReportsPage() {
 }
 
 function ReportContainer({ title, loading, error, onRetry, empty, children }: { title: string; loading: boolean; error?: string; onRetry: () => void; empty: boolean; children: React.ReactNode }) {
-  return <Card className="rounded-2xl border-blue-100/80 bg-white/90 shadow-[0_14px_36px_rgba(15,45,100,0.09)]"><CardHeader className="rounded-t-2xl border-b border-blue-50 bg-[linear-gradient(135deg,#f8fcff_0%,#eef7ff_100%)]"><CardTitle className="text-base text-slate-900">{title}</CardTitle></CardHeader><CardContent className="pt-6">{loading ? <div className="flex min-h-64 items-center justify-center gap-2 text-sm text-slate-500"><Loader2 className="animate-spin text-blue-700" />Loading report...</div> : error ? <div className="flex min-h-64 flex-col items-center justify-center rounded-xl bg-rose-50/35 text-center"><AlertCircle className="size-7 text-rose-600" /><p className="mt-3 text-sm text-rose-700">{error}</p><Button variant="outline" size="sm" className="mt-4" onClick={onRetry}><RefreshCw />Retry</Button></div> : empty ? <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-blue-100 bg-[linear-gradient(135deg,#f8fcff_0%,#eef7ff_100%)]"><div className="flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 ring-1 ring-blue-100"><FileBarChart className="size-6" /></div><p className="mt-3 text-sm font-medium">No report data available</p></div> : children}</CardContent></Card>
+  return <Card className="confera-panel overflow-hidden rounded-2xl"><CardHeader className="confera-panel-header rounded-t-2xl"><CardTitle className="text-base text-slate-900">{title}</CardTitle></CardHeader><CardContent className="pt-6">{loading ? <div className="flex min-h-64 items-center justify-center gap-2 text-sm text-slate-500"><Loader2 className="animate-spin text-blue-700" />Loading report...</div> : error ? <div className="flex min-h-64 flex-col items-center justify-center rounded-xl bg-rose-50/35 text-center"><AlertCircle className="size-7 text-rose-600" /><p className="mt-3 text-sm text-rose-700">{error}</p><Button variant="outline" size="sm" className="mt-4" onClick={onRetry}><RefreshCw />Retry</Button></div> : empty ? <div className="confera-empty-state flex min-h-64 flex-col items-center justify-center rounded-xl"><div className="flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 ring-1 ring-blue-100"><FileBarChart className="size-6" /></div><p className="mt-3 text-sm font-medium">No report data available</p></div> : children}</CardContent></Card>
 }
 
 function ReportTable({ type, rows }: { type: ReportType; rows: ReportRows[ReportType] }) {
-  return <div className="overflow-x-auto rounded-xl border border-blue-100 bg-white shadow-sm"><Table><TableHeader><ReportHeaders type={type} /></TableHeader><TableBody>{type === "bookings" && (rows as ReportRows["bookings"]).map((row) => <TableRow key={`${row.booking_reference}-${row.event_date}`}><TableCell className="font-medium text-slate-900">{row.booking_reference}</TableCell><TableCell>{row.event_title}</TableCell><TableCell>{row.client_name}</TableCell><TableCell>{row.hall_name}</TableCell><TableCell>{formatDate(row.event_date)}</TableCell><TableCell>{row.start_time.slice(0, 5)} - {row.end_time.slice(0, 5)}</TableCell><TableCell><ConferaStatusBadge value={row.booking_status} /></TableCell></TableRow>)}{type === "payments" && (rows as ReportRows["payments"]).map((row, index) => <TableRow key={`${row.invoice_number}-${row.payment_date}-${index}`}><TableCell className="font-medium text-slate-900">{row.invoice_number}</TableCell><TableCell>{row.client_name}</TableCell><TableCell>{row.event_title}</TableCell><TableCell>{formatDate(row.payment_date)}</TableCell><TableCell>{currency(row.amount)}</TableCell><TableCell>{row.payment_method}</TableCell><TableCell><ConferaStatusBadge value={row.status} /></TableCell></TableRow>)}{type === "hall-usage" && (rows as ReportRows["hall-usage"]).map((row) => <TableRow key={row.hall_name}><TableCell className="font-medium text-slate-900">{row.hall_name}</TableCell><TableCell>{row.total_bookings}</TableCell><TableCell>{row.confirmed_bookings}</TableCell><TableCell>{row.completed_bookings}</TableCell></TableRow>)}{type === "equipment" && (rows as ReportRows["equipment"]).map((row) => <TableRow key={row.equipment_name}><TableCell className="font-medium text-slate-900">{row.equipment_name}</TableCell><TableCell>{row.category}</TableCell><TableCell>{row.quantity_total}</TableCell><TableCell>{row.quantity_available}</TableCell><TableCell><ConferaStatusBadge value={row.status} /></TableCell></TableRow>)}{type === "staff" && (rows as ReportRows["staff"]).map((row) => <TableRow key={`${row.staff_name}-${row.role_name}`}><TableCell className="font-medium text-slate-900">{row.staff_name}</TableCell><TableCell>{row.role_name}</TableCell><TableCell>{row.total_assignments}</TableCell><TableCell>{row.completed_assignments}</TableCell><TableCell>{row.active_assignments}</TableCell></TableRow>)}</TableBody></Table></div>
+  return <div className="overflow-x-auto rounded-xl border border-blue-100 bg-white/80 shadow-sm"><Table><TableHeader><ReportHeaders type={type} /></TableHeader><TableBody>{type === "bookings" && (rows as ReportRows["bookings"]).map((row) => <TableRow key={`${row.booking_reference}-${row.event_date}`}><TableCell className="font-medium text-slate-900">{row.booking_reference}</TableCell><TableCell>{row.event_title}</TableCell><TableCell>{row.client_name}</TableCell><TableCell>{row.hall_name}</TableCell><TableCell>{formatDate(row.event_date)}</TableCell><TableCell>{row.start_time.slice(0, 5)} - {row.end_time.slice(0, 5)}</TableCell><TableCell><ConferaStatusBadge value={row.booking_status} /></TableCell></TableRow>)}{type === "payments" && (rows as ReportRows["payments"]).map((row, index) => <TableRow key={`${row.invoice_number}-${row.payment_date}-${index}`}><TableCell className="font-medium text-slate-900">{row.invoice_number}</TableCell><TableCell>{row.client_name}</TableCell><TableCell>{row.event_title}</TableCell><TableCell>{formatDate(row.payment_date)}</TableCell><TableCell>{currency(row.amount)}</TableCell><TableCell>{row.payment_method}</TableCell><TableCell><ConferaStatusBadge value={row.status} /></TableCell></TableRow>)}{type === "hall-usage" && (rows as ReportRows["hall-usage"]).map((row) => <TableRow key={row.hall_name}><TableCell className="font-medium text-slate-900">{row.hall_name}</TableCell><TableCell>{row.total_bookings}</TableCell><TableCell>{row.confirmed_bookings}</TableCell><TableCell>{row.completed_bookings}</TableCell></TableRow>)}{type === "equipment" && (rows as ReportRows["equipment"]).map((row) => <TableRow key={row.equipment_name}><TableCell className="font-medium text-slate-900">{row.equipment_name}</TableCell><TableCell>{row.category}</TableCell><TableCell>{row.quantity_total}</TableCell><TableCell>{row.quantity_available}</TableCell><TableCell><ConferaStatusBadge value={row.status} /></TableCell></TableRow>)}{type === "staff" && (rows as ReportRows["staff"]).map((row) => <TableRow key={`${row.staff_name}-${row.role_name}`}><TableCell className="font-medium text-slate-900">{row.staff_name}</TableCell><TableCell>{row.role_name}</TableCell><TableCell>{row.total_assignments}</TableCell><TableCell>{row.completed_assignments}</TableCell><TableCell>{row.active_assignments}</TableCell></TableRow>)}</TableBody></Table></div>
 }
 
 function ReportHeaders({ type }: { type: ReportType }) {
