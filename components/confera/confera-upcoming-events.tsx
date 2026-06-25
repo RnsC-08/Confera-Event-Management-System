@@ -16,20 +16,20 @@ function formatTime(value: string) {
 
 export function ConferaUpcomingEvents({ items }: { items: ConferaUpcomingEvent[] }) {
   return (
-    <Card className="rounded-xl border-blue-100/80 bg-white shadow-[0_8px_24px_rgba(15,45,100,0.08)] transition-shadow duration-200 hover:shadow-[0_12px_30px_rgba(15,72,184,0.11)]">
-      <CardHeader className="pb-3">
+    <Card className="overflow-hidden rounded-2xl border-blue-100/90 bg-[linear-gradient(180deg,#ffffff_0%,#f1f8ff_100%)] shadow-[0_14px_36px_rgba(15,45,100,0.12)] transition-shadow duration-200 hover:shadow-[0_18px_44px_rgba(15,72,184,0.15)]">
+      <CardHeader className="border-b border-blue-100/80 bg-[linear-gradient(135deg,#f8fcff_0%,#eaf5ff_100%)] pb-4">
         <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100"><CalendarRange className="size-5" /></div>
+          <div className="flex size-10 items-center justify-center rounded-2xl bg-blue-100 text-blue-800 shadow-sm ring-1 ring-blue-200"><CalendarRange className="size-5" /></div>
           <div><CardTitle className="text-base text-slate-900">Upcoming Events</CardTitle><CardDescription>Next bookings on the event calendar.</CardDescription></div>
         </div>
       </CardHeader>
       <CardContent>
         {items.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-blue-100 bg-blue-50/30 p-8 text-center text-sm text-slate-500">No upcoming events.</p>
+          <p className="rounded-xl border border-dashed border-blue-200 bg-blue-50/70 p-8 text-center text-sm text-slate-500">No upcoming events.</p>
         ) : (
-          <div className="divide-y divide-blue-50 overflow-hidden rounded-lg border border-blue-100/80">
+          <div className="divide-y divide-blue-100/70 overflow-hidden rounded-xl border border-blue-100/90 bg-white/72 shadow-sm">
             {items.map((item) => (
-              <article key={item.event_booking_id} className="p-4 transition-colors hover:bg-blue-50/45">
+              <article key={item.event_booking_id} className="p-4 transition-colors hover:bg-cyan-50/60">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2"><h3 className="truncate text-sm font-semibold text-slate-900">{item.event_title}</h3><ConferaStatusBadge value={item.booking_status} /></div>

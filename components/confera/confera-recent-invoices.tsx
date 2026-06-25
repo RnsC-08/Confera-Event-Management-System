@@ -48,11 +48,11 @@ export function ConferaRecentInvoices({
   return (
     <Card
       id="recent-invoices"
-      className="rounded-xl border-blue-100/80 bg-white shadow-[0_8px_24px_rgba(15,45,100,0.08)] transition-shadow duration-200 hover:shadow-[0_12px_30px_rgba(15,72,184,0.11)]"
+      className="overflow-hidden rounded-2xl border-blue-100/90 bg-[linear-gradient(180deg,#ffffff_0%,#f2fbf7_100%)] shadow-[0_14px_36px_rgba(15,45,100,0.12)] transition-shadow duration-200 hover:shadow-[0_18px_44px_rgba(15,72,184,0.15)]"
     >
-      <CardHeader className="pb-3">
+      <CardHeader className="border-b border-emerald-100/80 bg-[linear-gradient(135deg,#f8fcff_0%,#ecfff6_100%)] pb-4">
         <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100">
+          <div className="flex size-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-sm ring-1 ring-emerald-200">
             <ReceiptText className="size-5" />
           </div>
           <div>
@@ -65,7 +65,7 @@ export function ConferaRecentInvoices({
       </CardHeader>
       <CardContent>
         {items.length === 0 ? (
-          <Empty className="rounded-lg border border-dashed border-blue-100 bg-blue-50/30">
+          <Empty className="rounded-xl border border-dashed border-emerald-200 bg-emerald-50/60">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <ReceiptText className="size-5" />
@@ -119,7 +119,7 @@ export function ConferaRecentInvoices({
               {items.map((invoice) => (
                 <article
                   key={invoice.invoice_id}
-                  className="rounded-lg border border-blue-100/80 p-4 transition-colors hover:bg-blue-50/45"
+                    className="rounded-xl border border-blue-100/90 bg-white/72 p-4 shadow-sm transition-colors hover:bg-cyan-50/60"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
@@ -134,7 +134,7 @@ export function ConferaRecentInvoices({
                   </div>
                   <p className="mt-4 text-sm text-slate-700">{invoice.event_title}</p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                    <div className="rounded-md bg-slate-50 px-3 py-2">
+                    <div className="rounded-lg border border-blue-100/70 bg-blue-50/70 px-3 py-2">
                       <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
                         Total
                       </p>
@@ -142,7 +142,7 @@ export function ConferaRecentInvoices({
                         {formatCurrency(invoice.total_amount)}
                       </p>
                     </div>
-                    <div className="rounded-md bg-slate-50 px-3 py-2">
+                    <div className="rounded-lg border border-emerald-100/70 bg-emerald-50/70 px-3 py-2">
                       <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
                         Paid
                       </p>
@@ -150,7 +150,7 @@ export function ConferaRecentInvoices({
                         {formatCurrency(invoice.paid_amount)}
                       </p>
                     </div>
-                    <div className="rounded-md bg-slate-50 px-3 py-2">
+                    <div className="rounded-lg border border-cyan-100/70 bg-cyan-50/70 px-3 py-2">
                       <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
                         Date
                       </p>
