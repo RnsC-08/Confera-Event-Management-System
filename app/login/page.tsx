@@ -39,7 +39,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[linear-gradient(135deg,#f8fbff_0%,#e9f6ff_44%,#eefcff_100%)] px-4 py-8 text-slate-900">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[linear-gradient(135deg,#f8fbff_0%,#e9f6ff_44%,#eefcff_100%)] px-4 py-4 text-slate-900">
       <div className="pointer-events-none absolute -left-24 top-12 size-72 rounded-full bg-cyan-200/40 blur-3xl" />
       <div className="pointer-events-none absolute -right-28 bottom-8 size-80 rounded-full bg-blue-300/35 blur-3xl" />
       <div className="pointer-events-none absolute left-1/2 top-1/2 size-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-3xl" />
@@ -50,17 +50,17 @@ export default function LoginPage() {
       <div className="pointer-events-none absolute left-[18%] top-[62%] hidden h-16 w-16 bg-[radial-gradient(circle,#1648b8_1.5px,transparent_2px)] bg-[length:18px_18px] opacity-45 md:block" />
       <div className="pointer-events-none absolute right-[18%] top-[18%] hidden h-14 w-20 bg-[radial-gradient(circle,#06b6d4_1px,transparent_1.5px)] bg-[length:16px_16px] opacity-35 md:block" />
 
-      <Card className="relative z-10 w-full max-w-[430px] rounded-3xl border border-white/70 bg-white/85 shadow-[0_26px_90px_rgba(15,45,100,0.18)] backdrop-blur-xl">
-        <CardHeader className="items-center px-7 pb-5 pt-7 text-center sm:px-9">
-          <div className="flex w-full flex-col items-center rounded-2xl border border-blue-100/80 bg-[linear-gradient(180deg,#ffffff_0%,#f2f8ff_100%)] px-5 py-4 shadow-inner shadow-blue-50">
-            <Image src={conferaMark} alt="Confera logo" className="h-auto w-20 object-contain sm:w-24" priority />
-            <Image src={conferaName} alt="Confera" className="mt-2 h-auto w-full max-w-[230px] object-contain" priority />
+      <Card className="relative z-10 w-full max-w-[410px] gap-0 rounded-3xl border border-white/70 bg-white/85 py-0 shadow-[0_26px_90px_rgba(15,45,100,0.18)] backdrop-blur-xl">
+        <CardHeader className="items-center px-6 pb-4 pt-5 text-center sm:px-8">
+          <div className="flex w-full flex-col items-center rounded-2xl border border-blue-100/80 bg-[linear-gradient(180deg,#ffffff_0%,#f2f8ff_100%)] px-4 py-3 shadow-inner shadow-blue-50">
+            <Image src={conferaMark} alt="Confera logo" className="h-auto w-16 object-contain sm:w-20" priority />
+            <Image src={conferaName} alt="Confera" className="mt-1.5 h-auto w-full max-w-[200px] object-contain" priority />
           </div>
-          <p className="mt-5 text-sm font-semibold text-[#1648b8]">Welcome back</p>
+          <p className="mt-3 text-sm font-semibold text-[#1648b8]">Welcome back</p>
           <CardDescription className="mt-1 text-sm font-medium text-slate-600">Event Management System</CardDescription>
         </CardHeader>
-        <CardContent className="px-7 pb-8 sm:px-9">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <CardContent className="px-6 pb-6 sm:px-8">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && <div role="alert" className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-sm leading-5 text-rose-700"><AlertCircle className="mt-0.5 size-4 shrink-0" />{error}</div>}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-slate-700">Email</Label>
